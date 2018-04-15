@@ -27,7 +27,7 @@ from torch.autograd import Variable
 
 import config
 from dataloader import getDataloaders
-from utils import save_checkpoint, get_optimizer, create_save_folder
+from utils import save_checkpoint, get_optimizer, create_save_folder, normalize_image
 from args import arg_parser, arch_resume_names
 
 
@@ -307,9 +307,10 @@ def eval_superpixel():
             print(labels[0])
            
 
-            correct_pred_count=0
-            for i in range(10):               
-                random_sampled_list= random.sample(range(np.unique(segments)[0], np.unique(segments)[-1]), args.num_masked_superpixels)
+            correct_pred_count = 0
+            wrong_pred_count = 0
+            for i in range(1000):               
+                random_sampled_list= random.sample(range(np.unique(segments)[0], np.unique(segments)[-1]), 1)
 
                 mask = np.zeros(img.shape[:2], dtype= "uint8")
                 mask.fill(255)
@@ -326,9 +327,15 @@ def eval_superpixel():
                 masked_img_tensor = Variable(torch.from_numpy(masked_img_batch)).cuda()
                 mask_output = model(masked_img_tensor)
                 
-                pred_mask = mask_output.images.max(1, keepdim=True)[1]
-                print("pred_mask[0]", pred_mask[0].cpu().numpy()[0])
+                pred_mask = mask_output.data.max(1, keepdim=True)[1]
+                #print("pred_mask[0]", pred_mask[0].cpu().numpy()[0])
 
+                if pred_mask[0].cpu().numpy()[0] == labels[0].cpu().data.numpy()[0]:
+                    correct_pred_count+=1
+                    print("correct_pred_count: ", correct_pred_count)
+                else:
+                    wrong_pred_count+=1
+                    print("wrong_pred_count: ", wrong_pred_count)
 
             #     mask_probability_score = mask_probability_output.max(1, keepdim=True)[0]
             #     # print("mask_probability_score")
