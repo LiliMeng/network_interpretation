@@ -262,7 +262,7 @@ def eval_superpixel():
 
         count +=1
 
-        if count > 1:
+        if count > 2:
             break
         # show images
        # imshow(torchvision.utils.make_grid(images), ' '.join('%5s' % classes[labels[j]] for j in range(1)))
@@ -286,7 +286,7 @@ def eval_superpixel():
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
    
-        if count == 1:
+        if count == 2:
 
             cv2.imwrite('original_img_index{}_label_{}.png'.format(count, labels[0].cpu().data.numpy()[0]), img)
 
@@ -295,32 +295,30 @@ def eval_superpixel():
             print("Felzenszwalb number of segments: {}".format(len(np.unique(segments))))
             
 
-            cv2.imshow('superpixels', mark_boundaries(img_as_float(img), segments))
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
+            # cv2.imshow('superpixels', mark_boundaries(img_as_float(img), segments))
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
             output = model(images)
             pred = output.data.max(1, keepdim=True)[1]
             
-            print("prediction[0]")
-            print(pred[0])
-            print("ground truth labels[0]")
-            print(labels[0])
-           
-
+       
             correct_pred_count = 0
             wrong_pred_count = 0
             for i in range(1000):               
                 random_sampled_list= random.sample(range(np.unique(segments)[0], np.unique(segments)[-1]), 1)
-
+               
                 mask = np.zeros(img.shape[:2], dtype= "uint8")
                 mask.fill(255)
                 for (j, segVal) in enumerate(random_sampled_list):
                     mask[segments == segVal] = 0
                     
 
-                masked_img = org_img * mask
+                masked_img = org_img #* mask
                 
+                #print("org_img")
+                #print(org_img)
                 masked_img = normalize_image(masked_img)
+
                 masked_img_batch = masked_img[None, :, :, :]
 
             
@@ -328,14 +326,19 @@ def eval_superpixel():
                 mask_output = model(masked_img_tensor)
                 
                 pred_mask = mask_output.data.max(1, keepdim=True)[1]
-                #print("pred_mask[0]", pred_mask[0].cpu().numpy()[0])
+               
+                print("pred_mask[0]", pred_mask[0].cpu().numpy()[0])
 
                 if pred_mask[0].cpu().numpy()[0] == labels[0].cpu().data.numpy()[0]:
                     correct_pred_count+=1
                     print("correct_pred_count: ", correct_pred_count)
+                    cv2.imwrite('./masks/mask_{}_{}.png'.format(i, 1), mask)
+                    cv2.imwrite('./mask_on_img/masked_imgs_{}.png'.format(i), masked_img.transpose(1, 2, 0))
                 else:
                     wrong_pred_count+=1
                     print("wrong_pred_count: ", wrong_pred_count)
+                    cv2.imwrite('./masks/mask_{}_{}.png'.format(i, 1), mask)
+                    cv2.imwrite('./mask_on_img/masked_imgs_{}.png'.format(i), masked_img.transpose(1, 2, 0))
 
             #     mask_probability_score = mask_probability_output.max(1, keepdim=True)[0]
             #     # print("mask_probability_score")
