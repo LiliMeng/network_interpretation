@@ -305,7 +305,7 @@ def eval_superpixel():
             correct_pred_count = 0
             wrong_pred_count = 0
             for i in range(1000):               
-                random_sampled_list= random.sample(range(np.unique(segments)[0], np.unique(segments)[-1]), 1)
+                random_sampled_list= random.sample(range(np.unique(segments)[0], np.unique(segments)[-1]), 5)
                
                 mask = np.zeros(img.shape[:2], dtype= "uint8")
                 mask.fill(255)
@@ -313,11 +313,13 @@ def eval_superpixel():
                     mask[segments == segVal] = 0
                     
 
-                masked_img = org_img #* mask
+                masked_img = org_img * mask
                 
-                #print("org_img")
-                #print(org_img)
+                masked_img -= masked_img.min()
+                masked_img /= masked_img.max()
+                masked_img *= 255
                 masked_img = normalize_image(masked_img)
+                print(masked_img)
 
                 masked_img_batch = masked_img[None, :, :, :]
 
@@ -340,30 +342,14 @@ def eval_superpixel():
                     cv2.imwrite('./masks/mask_{}_{}.png'.format(i, 1), mask)
                     cv2.imwrite('./mask_on_img/masked_imgs_{}.png'.format(i), masked_img.transpose(1, 2, 0))
 
-            #     mask_probability_score = mask_probability_output.max(1, keepdim=True)[0]
-            #     # print("mask_probability_score")
-            #     # print(mask_probability_score.cpu().data)
-            #     pred_mask = mask_output.images.max(1, keepdim=True)[1]
-            #     # print("pred_mask[0]", pred_mask[0].cpu().numpy()[0])
-
-            #     if pred_mask[0].cpu().numpy()[0] == labels[0].cpu().data.numpy()[0]:
-            #         correct_pred_count+=1
-            #         print("correct_pred_count", correct_pred_count)
-               
-            #         cv2.imwrite('./masks/mask_{}_{}.png'.format(i, 1), mask)
-            #         cv2.imwrite('./mask_on_img/masked_imgs_{}_pred_{}_{}_{}.png'.format(i, pred_mask[0].cpu().numpy()[0], 1, mask_probability_score.cpu().data.numpy()[0]), pic)
-            #     else:
-            #         cv2.imwrite('./masks/mask_{}_{}.png'.format(i, 0), mask)
-            #         cv2.imwrite('./mask_on_img/masked_imgs_{}_pred_{}_{}_{}.png'.format(i, pred_mask[0].cpu().numpy()[0], 0, mask_probability_score.cpu().data.numpy()[0]), pic)
-
-               
-            #     # plt.subplot(151),plt.imshow(colored_img, 'gray'),plt.title('original_img_label_{}.png'.format(labels[0].cpu().data.numpy()[0]))
-            #     # plt.subplot(152),plt.imshow(mark_boundaries(img_as_float(colored_img), segments),'gray'),plt.title('Superpixel')
-            #     # plt.subplot(153),plt.imshow(cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB), 'gray'), plt.title("Mask")
-            #     # plt.subplot(154),plt.imshow(cv2.cvtColor(colored_pic, cv2.COLOR_BGR2RGB),'gray'),plt.title('Org_img with mask gray')
-            #     # plt.subplot(155),plt.imshow(cv2.cvtColor(mask_heatmap, cv2.COLOR_BGR2RGB),'gray'),plt.title('Org_img with mask heatmap pred {}'.format(pred_mask[0].cpu().numpy()))
-            #     # plt.show()
-            #     # plt.close()
+          
+                plt.subplot(121),plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), 'gray'),plt.title('original_img')
+                plt.subplot(122),plt.imshow(mark_boundaries(img_as_float(img), segments),'gray'),plt.title('Superpixel')
+                #plt.subplot(153),plt.imshow(cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB), 'gray'), plt.title("Mask")
+                #plt.subplot(154),plt.imshow(cv2.cvtColor(colored_pic, cv2.COLOR_BGR2RGB),'gray'),plt.title('Org_img with mask gray')
+               # plt.subplot(133),plt.imshow(cv2.cvtColor(masked_img, cv2.COLOR_BGR2RGB),'gray'),plt.title('Org_img with mask heatmap pred {}'.format(pred_mask[0].cpu().numpy()))
+                plt.show()
+                plt.close()
         
 if train_nn == True:
   train_model()
