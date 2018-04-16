@@ -192,11 +192,14 @@ likelihood.eval()
 f, observed_ax = plt.subplots(1, 1, figsize=(4, 3))
 # Test points are 100x100 grid of [0,1]x[0,1] with spacing of 1/99
 
-test_x = Variable(torch.zeros(int(pow(n, 2)), 2)).cuda()
+test_x = []
 for i in range(n):
     for j in range(n):
-        test_x.data[i * n + j][0] = i
-        test_x.data[i * n + j][1] = j
+        test_x.append([i, j])
+      
+
+test_x = Variable(torch.FloatTensor(np.asarray(test_x))).cuda()
+
         
 # Make binary predictions by warmping the model output through a Bernoulli likelihood
 with gpytorch.beta_features.fast_pred_var():
