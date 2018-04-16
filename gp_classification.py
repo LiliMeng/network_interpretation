@@ -91,7 +91,7 @@ cv2.imwrite('./weighted_mask/weighted_mask.png', result_gray_img)
 
 #cv2.imshow("result_img", result_gray_img)       
 result_gray_img = np.array(result_gray_img, dtype = np.uint8)
-result_heatmap = cv2.applyColorMap(result_gray_img, cv2.COLORMAP_JET )
+result_heatmap = cv2.applyColorMap(result_gray_img, cv2.COLORMAP_JET)
 
 cv2.imwrite('./weighted_mask/weighted_mask_heatmap.png', result_heatmap)
 # cv2.imshow("result_heatmap", result_heatmap)
@@ -167,7 +167,7 @@ optimizer = torch.optim.Adam([
 mll = gpytorch.mlls.VariationalMarginalLogLikelihood(likelihood, model, n_data=len(train_y))
 
 def train():
-    num_training_iterations = 20
+    num_training_iterations = 50
     for i in range(num_training_iterations):
         # zero back propped gradients
         optimizer.zero_grad()
@@ -247,7 +247,7 @@ org_img = cv2.imread('original_img_index2_label_8.png')
 
 
 plt.subplot(131),plt.imshow(org_img,'gray'),plt.title('Original img')
-plt.subplot(132),plt.imshow(cv2.cvtColor(result_heatmap, cv2.COLOR_BGR2RGB),'jet'),plt.title('Summed label training heatmap')
+plt.subplot(132),plt.imshow(result_heatmap,'gray'),plt.title('Summed label training heatmap')
 plt.subplot(133),plt.imshow(cv2.cvtColor(test_heatmap, cv2.COLOR_BGR2RGB),'gray'),plt.title('Predicted mask heatmap')
 #plt.subplot(144),plt.imshow(cv2.cvtColor(final_masked_img_color, cv2.COLOR_BGR2RGB),'gray'),plt.title('Org_img with predicted mask')
 
