@@ -290,7 +290,7 @@ def eval_superpixel():
 
             cv2.imwrite('original_img_index{}_label_{}.png'.format(count, labels[0].cpu().data.numpy()[0]), img)
 
-            segments = felzenszwalb(img_as_float(img), scale=100, sigma=0.5, min_size=5)
+            segments = felzenszwalb(img_as_float(img), scale=100, sigma=0.5, min_size=20)
             
             print("Felzenszwalb number of segments: {}".format(len(np.unique(segments))))
             
@@ -305,7 +305,7 @@ def eval_superpixel():
             correct_pred_count = 0
             wrong_pred_count = 0
             for i in range(1000):               
-                random_sampled_list= random.sample(range(np.unique(segments)[0], np.unique(segments)[-1]), 5)
+                random_sampled_list= random.sample(range(np.unique(segments)[0], np.unique(segments)[-1]), 1)
                
                 mask = np.zeros(img.shape[:2], dtype= "uint8")
                 mask.fill(255)
@@ -319,7 +319,6 @@ def eval_superpixel():
                 masked_img /= masked_img.max()
                 masked_img *= 255
                 masked_img = normalize_image(masked_img)
-                print(masked_img)
 
                 masked_img_batch = masked_img[None, :, :, :]
 
@@ -343,13 +342,11 @@ def eval_superpixel():
                     cv2.imwrite('./mask_on_img/masked_imgs_{}.png'.format(i), masked_img.transpose(1, 2, 0))
 
           
-                plt.subplot(121),plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), 'gray'),plt.title('original_img')
-                plt.subplot(122),plt.imshow(mark_boundaries(img_as_float(img), segments),'gray'),plt.title('Superpixel')
-                #plt.subplot(153),plt.imshow(cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB), 'gray'), plt.title("Mask")
-                #plt.subplot(154),plt.imshow(cv2.cvtColor(colored_pic, cv2.COLOR_BGR2RGB),'gray'),plt.title('Org_img with mask gray')
-               # plt.subplot(133),plt.imshow(cv2.cvtColor(masked_img, cv2.COLOR_BGR2RGB),'gray'),plt.title('Org_img with mask heatmap pred {}'.format(pred_mask[0].cpu().numpy()))
-                plt.show()
-                plt.close()
+                # plt.subplot(131),plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), 'gray'),plt.title('org_img_label_{}'.format(classes[pred_mask[0].cpu().numpy()[0]]))
+                # plt.subplot(132),plt.imshow(mark_boundaries(img_as_float(img), segments),'gray'),plt.title('Superpixel')
+                # plt.subplot(133),plt.imshow(cv2.cvtColor(masked_img.transpose(1, 2, 0), cv2.COLOR_BGR2RGB),'gray'),plt.title('Org_img_with_mask_pred_{}'.format(classes[pred_mask[0].cpu().numpy()[0]]))
+                # plt.show()
+                # plt.close()
         
 if train_nn == True:
   train_model()
