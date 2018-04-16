@@ -167,7 +167,7 @@ optimizer = torch.optim.Adam([
 mll = gpytorch.mlls.VariationalMarginalLogLikelihood(likelihood, model, n_data=len(train_y))
 
 def train():
-    num_training_iterations = 50 
+    num_training_iterations = 20
     for i in range(num_training_iterations):
         # zero back propped gradients
         optimizer.zero_grad()

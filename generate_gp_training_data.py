@@ -290,7 +290,7 @@ def eval_superpixel():
 
             cv2.imwrite('original_img_index{}_label_{}.png'.format(count, labels[0].cpu().data.numpy()[0]), img)
 
-            segments = felzenszwalb(img_as_float(img), scale=100, sigma=0.5, min_size=20)
+            segments = felzenszwalb(img_as_float(img), scale=100, sigma=0.5, min_size=10)
             
             print("Felzenszwalb number of segments: {}".format(len(np.unique(segments))))
             
@@ -338,7 +338,7 @@ def eval_superpixel():
                 else:
                     wrong_pred_count+=1
                     print("wrong_pred_count: ", wrong_pred_count)
-                    cv2.imwrite('./masks/mask_{}_{}.png'.format(i, 1), mask)
+                    cv2.imwrite('./masks/mask_{}_{}.png'.format(i, 0), mask)
                     cv2.imwrite('./mask_on_img/masked_imgs_{}.png'.format(i), masked_img.transpose(1, 2, 0))
 
           
